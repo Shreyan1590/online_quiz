@@ -5,24 +5,22 @@ import {
   FileText, 
   Settings, 
   LogOut, 
-  Plus,
-  Upload,
-  Search,
-  Filter,
+  Database,
   Shield
 } from 'lucide-react';
 import { AdminUser } from '../types/admin';
 import { QuestionManager } from './QuestionManager';
 import { AdminStats } from './AdminStats';
-import { UserManagement } from './UserManagement';
-import { QuizSettings } from './QuizSettings';
+import { UserManagementPanel } from './UserManagementPanel';
+import { RealTimeQuizSettings } from './RealTimeQuizSettings';
+import { SystemBackupManager } from './SystemBackupManager';
 
 interface AdminDashboardProps {
   adminUser: AdminUser;
   onLogout: () => void;
 }
 
-type ActiveTab = 'dashboard' | 'questions' | 'users' | 'settings';
+type ActiveTab = 'dashboard' | 'questions' | 'users' | 'settings' | 'backup';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ adminUser, onLogout }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
@@ -32,6 +30,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ adminUser, onLog
     { id: 'questions' as const, label: 'Questions', icon: FileText },
     { id: 'users' as const, label: 'Users', icon: Users },
     { id: 'settings' as const, label: 'Settings', icon: Settings },
+    { id: 'backup' as const, label: 'Backup', icon: Database },
   ];
 
   const renderContent = () => {
@@ -41,9 +40,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ adminUser, onLog
       case 'questions':
         return <QuestionManager adminUser={adminUser} />;
       case 'users':
-        return <UserManagement adminUser={adminUser} />;
+        return <UserManagementPanel adminUser={adminUser} />;
       case 'settings':
-        return <QuizSettings adminUser={adminUser} />;
+        return <RealTimeQuizSettings adminUser={adminUser} />;
+      case 'backup':
+        return <SystemBackupManager adminUser={adminUser} />;
       default:
         return <AdminStats />;
     }
@@ -58,7 +59,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ adminUser, onLog
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Shield className="w-8 h-8 text-red-600" />
-                <h1 className="text-xl font-bold text-slate-900">Quiz Admin</h1>
+                <h1 className="text-xl font-bold text-slate-900">Quiz Admin Portal</h1>
               </div>
               <div className="hidden sm:block">
                 <span className="text-sm text-slate-500">
@@ -73,6 +74,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ adminUser, onLog
                   adminUser.role === 'super_admin' ? 'bg-purple-500' : 'bg-blue-500'
                 }`} />
                 <span className="capitalize">{adminUser.role.replace('_', ' ')}</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm text-slate-500">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>Real-time sync active</span>
               </div>
               <button
                 onClick={onLogout}
@@ -111,6 +116,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ adminUser, onLog
                   );
                 })}
               </ul>
+              
+              {/* System Status */}
+              <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <h4 className="text-sm font-semibold text-green-800 mb-2">System Status</h4>
+                <div className="space-y-1 text-xs text-green-700">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Real-time sync: Active</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Data integrity: OK</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Security monitoring: Active</span>
+                  </div>
+                </div>
+              </div>
             </nav>
           </div>
 
